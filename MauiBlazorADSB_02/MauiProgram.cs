@@ -24,6 +24,8 @@ namespace MauiBlazorADSB_02
 
             builder.Services.AddSingleton<WeatherForecastService>();
 
+            builder.Services.AddSingleton<OpenSkyApiService>();
+
             return builder.Build();
         }
     }

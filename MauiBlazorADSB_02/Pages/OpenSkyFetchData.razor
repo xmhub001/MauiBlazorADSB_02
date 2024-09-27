@@ -40,7 +40,7 @@ else
         </thead>
         <tbody>
             
-            @foreach (var osky in openskyData[0].States)
+            @foreach (var osky in openskyData[0])
             {
                 <tr>
                     <td>@osky.Icao24.ToString()</td>
@@ -73,7 +73,7 @@ else
 @code {
     //   array list = [icao24, callsign, origin_country, utc_timeposition, utc_timelastcontact, lng, lat, baro_alt,
     // on_grd, velocity, true_trk, vert_rate, sensors, geo_alt, squawk, spi, position_src, category];
-    private OpenSkyApiModel[] openskyData;
+    private List<List<OpenSkyApiModelData2>> openskyData;
 
     //https_//opensky-network.org/api/states/all?lamin=37.020&lomin=-109.080&lamax=40.980&lomax=-102.080
 
@@ -85,14 +85,23 @@ else
         string maxlng = "-102.080"; //-102.080
 
         OpenSkyApiService openskyService = new OpenSkyApiService();
-        List<OpenSkyApiModel> openskyApiData;
+
+        List<List<OpenSkyApiModelData2>> openskyApiData;
+        OpenSkyApiModel2 openskyDataResponse;
 
         var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
-        //<List<OpenSkyApiModel>> openskyAPIData;
         if(data != null)
         {
-            openskyApiData = (List<OpenSkyApiModel>)data;
-            openskyData = openskyApiData.ToArray<OpenSkyApiModel>();
+            openskyDataResponse = JsonSerializer.Deserialize<OpenSkyApiModel2>(data.ToString());
+            if(openskyDataResponse != null)
+            {
+                openskyApiData = openskyDataResponse.States;
+
+                //openskyApiData = (List<OpenSkyApiModel>)data;
+                openskyData = openskyApiData;   //.ToArray<OpenSkyApiModelData2>();  //.ToArray<OpenSkyApiModel>();
+            }
+
+            
         }
     }
 }
