@@ -1,0 +1,98 @@
+﻿@page "/openskyfetchdata"
+
+@using MauiBlazorADSB_02.Data
+@using System.Text.Json
+@inject OpenSkyApiService openskyApiService
+
+<h1>OpenSky Data</h1>
+
+<p>This component fetches and displays OpenSky ADSB data from a service.</p>
+
+@if (openskyData == null)
+{
+    <p><em>Loading..</em></p>
+}
+else
+{
+    <table  class="table">
+        <thead>
+            <tr>
+                <th>Icao24</th>
+                <th>CallSign</th>
+                <th>Origin Country</th>
+                <th>UTC TimePosition</th>
+                <th>UTC TimeLastContact</th>
+                <th>Lng</th>
+                <th>Lat</th>
+                <th>Baro_alt</th>
+                <th>On_Grd</th>
+                <th>Velocity</th>
+                <th>Heading</th>
+                <th>True_Trak</th>
+                <th>Vert_Rate</th>
+                <th>Sensors</th>
+                <th>Geo_alt</th>
+                <th>Squawk</th>
+                <th>SPI</th>
+                <th>Position_Src</th>
+                <th>category</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            @foreach (var osky in openskyData[0].States)
+            {
+                <tr>
+                    <td>@osky.Icao24.ToString()</td>
+                    <td>@osky.Callsign.ToString()</td>
+                    <td>@osky.Origin_country.ToString()</td>
+                    <td>@osky.Utc_timeposition.ToString()</td>
+                    <td>@osky.Utc_timelastcontact.ToString()</td>
+                    <td>@osky.Lng.ToString()</td>
+                    <td>@osky.Lat.ToString()</td>
+                    <td>@osky.Baro_alt.ToString()</td>
+                    <td>@osky.On_grd.ToString()</td>
+                    <td>@osky.Velocity.ToString()</td>
+                    <td>@osky.Heading.ToString()</td>
+                    <td>@osky.True_trk.ToString()</td>
+                    <td>@osky.Vert_rate.ToString()</td>
+                    <td>@osky.Sensors.ToString()</td>
+                    <td>@osky.Geo_alt.ToString()</td>
+                    <td>@osky.Squawk.ToString()</td>
+                    <td>@osky.Spi.ToString()</td>
+                    <td>@osky.Position_src.ToString()</td>
+                    <td>@osky.Category.ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+}
+
+
+@code {
+    //   array list = [icao24, callsign, origin_country, utc_timeposition, utc_timelastcontact, lng, lat, baro_alt,
+    // on_grd, velocity, true_trk, vert_rate, sensors, geo_alt, squawk, spi, position_src, category];
+    private OpenSkyApiModel[] openskyData;
+
+    //https_//opensky-network.org/api/states/all?lamin=37.020&lomin=-109.080&lamax=40.980&lomax=-102.080
+
+    protected override async Task OnInitializedAsync()
+    {
+        string minlat = "37.020"; //37.020
+        string minlng = "-109.080"; //-109.080
+        string maxlat = "40.980"; //40.980
+        string maxlng = "-102.080"; //-102.080
+
+        OpenSkyApiService openskyService = new OpenSkyApiService();
+        List<OpenSkyApiModel> openskyApiData;
+
+        var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
+        //<List<OpenSkyApiModel>> openskyAPIData;
+        if(data != null)
+        {
+            openskyApiData = (List<OpenSkyApiModel>)data;
+            openskyData = openskyApiData.ToArray<OpenSkyApiModel>();
+        }
+    }
+}
