@@ -90,7 +90,7 @@ else
         OpenSkyApiService openskyService = new OpenSkyApiService();
 
         //List<List<OpenSkyApiModelData2>> openskyApiData;
-        List<OpenSkyApiModelData2> openskyDataResponse;
+        OpenSkyApiModel2 openskyDataResponse = new OpenSkyApiModel2();
 
         try
         {
@@ -101,9 +101,23 @@ else
                 // JsonNode opensky = JsonNode.Parse(data.ToString());
                 // // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
                 // JsonSerializerOptions options = null;
-                var openskyjson = JsonNode.Parse(data.ToString())["states"];
-                openskyDataResponse = JsonSerializer.Deserialize<List<OpenSkyApiModelData2>>(openskyjson.ToString());  //(data.ToString());
-                string llat = openskyDataResponse[0].Lat.ToString();
+                JsonArray openskyjson = JsonNode.Parse(data.ToString())["states"].AsArray(); //JsonNode.Parse(data.ToString()).AsArray();
+                for(int i = 0; i < openskyjson.AsArray().Count; i++)
+                {
+                    for (int j = 0; j < openskyjson.AsArray()[1].AsArray().Count(); j++)
+                    {
+                        OpenSkyApiModelData2 osm = new OpenSkyApiModelData2();
+                        osm.Origin_country = openskyjson.AsArray()[1].AsArray()[j].ToString();
+                    }
+                }
+
+
+                System.Diagnostics.Debug.Print("err");
+                //openskyDataResponse = (OpenSkyApiModel2)openskyjson;
+
+
+                // openskyDataResponse = JsonSerializer.Deserialize<List<OpenSkyApiModelData2>>(openskyjson.ToString());  //(data.ToString());
+                // string llat = openskyDataResponse[0].Lat.ToString();
 
                 // using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(data.ToString())))
                 // {
