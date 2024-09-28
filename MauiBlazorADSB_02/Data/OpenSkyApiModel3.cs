@@ -1,21 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MauiBlazorADSB_02.Data
 {
-    internal class OpenSkyApiModel2
+    [DataContract]
+    class OpenSkyApiModel3
     {
-        [JsonPropertyName("time")]
+        [DataMember]
         public int Time { get; set; }
-        [JsonPropertyName("states")] 
-        public List<List<OpenSkyApiModelData2>> States { get; set; }
+        [DataMember] 
+        public List<List<OpenSkyApiModelData3>> States { get; set; }
     }
 
-    internal class OpenSkyApiModelData2
+    [DataContract]
+    class OpenSkyApiModelData3
     {
         /*
            * {
@@ -29,46 +32,43 @@ namespace MauiBlazorADSB_02.Data
            false,27.7,   328.67,  -1.63,   null,  2819.4,null, false, 0
        ],[
        */
-        [JsonPropertyName("icao24")]
+        [DataMember]
         public string Icao24 { get; set; }
-        [JsonPropertyName("callsign")]
+        [DataMember]
         public string Callsign { get; set; }
-        [JsonPropertyName("origin_country")]
+        [DataMember]
         public string Origin_country { get; set; }
-        [JsonPropertyName("utc_timeposition")]
+        [DataMember]
         public string Utc_timeposition { get; set; }
-        [JsonPropertyName("utc_timelastcontact")]
+        [DataMember]
         public string Utc_timelastcontact { get; set; }
-        [JsonPropertyName("lng")]
+        [DataMember]
         public double Lng { get; set; }
-        [JsonPropertyName("lat")]
+        [DataMember]
         public double Lat { get; set; }
-        [JsonPropertyName("baro_alt")]
+        [DataMember]
         public double Baro_alt { get; set; }
-        [JsonPropertyName("on_grd")]
+        [DataMember]
         public string On_grd { get; set; }
-        [JsonPropertyName("velocity")]
+        [DataMember]
         public double Velocity { get; set; }
-        //[JsonPropertyName("heading")]
+        //[DataMember]
         //public double Heading { get; set; }
-        [JsonPropertyName("true_trk")]
+        [DataMember]
         public double True_trk { get; set; }
-        [JsonPropertyName("vert_rate")]
+        [DataMember]
         public double Vert_rate { get; set; } //m/s
-        [JsonPropertyName("sensors")]
+        [DataMember]
         public string Sensors { get; set; }
-        [JsonPropertyName("geo_alt")]
+        [DataMember]
         public double Geo_alt { get; set; }
-        [JsonPropertyName("squawk")]
+        [DataMember]
         public string Squawk { get; set; }
-        [JsonPropertyName("spi")]
+        [DataMember]
         public bool Spi { get; set; }  //safety performance indicator
-        [JsonPropertyName("position_src")]
+        [DataMember]
         public int Position_src { get; set; }
-        //[JsonPropertyName("category")]
+        //[DataMember]
         //public int Category { get; set; }
-
-
     }
-
 }

@@ -26,14 +26,14 @@ namespace MauiBlazorADSB_02.Data
             return await _httpClient.GetFromJsonAsync<Object>($"all?lamin={minlatitude}&lomin={minlongitude}&lamax={maxlatitude}&lomax={maxlongitude}");
         }
 
-        public async Task<OpenSkyApiModel> GetOpenSkyInformationAsync2(string minlatitude, string minlongitude, string maxlatitude, string maxlongitude)
+        public async Task<List<List<object>>> GetOpenSkyInformationAsync2(string minlatitude, string minlongitude, string maxlatitude, string maxlongitude)
         {
             if (Connectivity.Current.NetworkAccess != NetworkAccess.Internet)
             {
                 return null;
             }
             //https_//opensky-network.org/api/states/all?lamin=37.020&lomin=-109.080&lamax=40.980&lomax=-102.080
-            return await _httpClient.GetFromJsonAsync<OpenSkyApiModel>($"all?lamin={minlatitude}&lomin={minlongitude}&lamax={maxlatitude}&lomax={maxlongitude}");
+            return await _httpClient.GetFromJsonAsync<List<List<object>>>($"all?lamin={minlatitude}&lomin={minlongitude}&lamax={maxlatitude}&lomax={maxlongitude}");
         }
     }
 }

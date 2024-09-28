@@ -2,6 +2,9 @@
 
 @using MauiBlazorADSB_02.Data
 @using System.Text.Json
+@using System.Text.Json.Nodes
+@using System.Text
+@using System.Runtime.Serialization.Json
 @inject OpenSkyApiService openskyApiService
 
 <h1>OpenSky Data</h1>
@@ -40,28 +43,28 @@ else
         </thead>
         <tbody>
             
-            @foreach (var osky in openskyData[0])
+            @foreach (var osky in openskyData)
             {
                 <tr>
-                    <td>@osky.Icao24.ToString()</td>
-                    <td>@osky.Callsign.ToString()</td>
-                    <td>@osky.Origin_country.ToString()</td>
-                    <td>@osky.Utc_timeposition.ToString()</td>
-                    <td>@osky.Utc_timelastcontact.ToString()</td>
-                    <td>@osky.Lng.ToString()</td>
-                    <td>@osky.Lat.ToString()</td>
-                    <td>@osky.Baro_alt.ToString()</td>
-                    <td>@osky.On_grd.ToString()</td>
-                    <td>@osky.Velocity.ToString()</td>
-                    <td>@osky.Heading.ToString()</td>
-                    <td>@osky.True_trk.ToString()</td>
-                    <td>@osky.Vert_rate.ToString()</td>
-                    <td>@osky.Sensors.ToString()</td>
-                    <td>@osky.Geo_alt.ToString()</td>
-                    <td>@osky.Squawk.ToString()</td>
-                    <td>@osky.Spi.ToString()</td>
-                    <td>@osky.Position_src.ToString()</td>
-                    <td>@osky.Category.ToString()</td>
+                    <td>@osky[0].Icao24.ToString()</td>
+                    <td>@osky[0].Callsign.ToString()</td>
+                    <td>@osky[0].Origin_country.ToString()</td>
+                    <td>@osky[0].Utc_timeposition.ToString()</td>
+                    <td>@osky[0].Utc_timelastcontact.ToString()</td>
+                    <td>@osky[0].Lng.ToString()</td>
+                    <td>@osky[0].Lat.ToString()</td>
+                    <td>@osky[0].Baro_alt.ToString()</td>
+                    <td>@osky[0].On_grd.ToString()</td>
+                    <td>@osky[0].Velocity.ToString()</td>
+                    @* <td>@osky[0].Heading.ToString()</td> *@
+                    <td>@osky[0].True_trk.ToString()</td>
+                    <td>@osky[0].Vert_rate.ToString()</td>
+                    <td>@osky[0].Sensors.ToString()</td>
+                    <td>@osky[0].Geo_alt.ToString()</td>
+                    <td>@osky[0].Squawk.ToString()</td>
+                    <td>@osky[0].Spi.ToString()</td>
+                    <td>@osky[0].Position_src.ToString()</td>
+                    @* <td>@osky[0].Category.ToString()</td> *@
                 </tr>
             }
         </tbody>
@@ -86,22 +89,55 @@ else
 
         OpenSkyApiService openskyService = new OpenSkyApiService();
 
-        List<List<OpenSkyApiModelData2>> openskyApiData;
-        OpenSkyApiModel2 openskyDataResponse;
+        //List<List<OpenSkyApiModelData2>> openskyApiData;
+        List<OpenSkyApiModelData2> openskyDataResponse;
 
-        var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
-        if(data != null)
+        try
         {
-            openskyDataResponse = JsonSerializer.Deserialize<OpenSkyApiModel2>(data.ToString());
-            if(openskyDataResponse != null)
+            var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
+            if (data != null)
             {
-                openskyApiData = openskyDataResponse.States;
 
-                //openskyApiData = (List<OpenSkyApiModel>)data;
-                openskyData = openskyApiData;   //.ToArray<OpenSkyApiModelData2>();  //.ToArray<OpenSkyApiModel>();
+                // JsonNode opensky = JsonNode.Parse(data.ToString());
+                // // Root myDeserializedClass = JsonConvert.DeserializeObject<Root>(myJsonResponse);
+                // JsonSerializerOptions options = null;
+                var openskyjson = JsonNode.Parse(data.ToString())["states"];
+                openskyDataResponse = JsonSerializer.Deserialize<List<OpenSkyApiModelData2>>(openskyjson.ToString());  //(data.ToString());
+                string llat = openskyDataResponse[0].Lat.ToString();
+
+                // using (var ms = new MemoryStream(Encoding.Unicode.GetBytes(data.ToString())))
+                // {
+                //     DataContractJsonSerializer deserializer = new DataContractJsonSerializer(typeof(OpenSkyApiModel3));
+                //     OpenSkyApiModel3 osObj2 = (OpenSkyApiModel3)deserializer.ReadObject(ms);
+                //     //string llat = osObj2.States[0].Lat.ToString();
+                // }
+
+               // if (openskyDataResponse != null)
+               // {
+               //     //openskyApiData = openskyDataResponse.States;
+
+               //     //openskyApiData = (List<OpenSkyApiModel>)data;
+               //     //openskyData = openskyDataResponse.States;   //.ToArray<OpenSkyApiModelData2>();  //.ToArray<OpenSkyApiModel>();
+               // }
+               
+
+                // JsonNode opensky = JsonNode.Parse(data.ToString());
+                // JsonObject openskyObj = opensky!["States"]!.AsObject();
+                // using var stream = new MemoryStream();
+                // using var writer = new Utf8JsonWriter(stream);
+                // openskyObj.WriteTo(writer);
+                // writer.Flush();
+                // List<List<OpenSkyApiModelData2>> openskylist = JsonSerializer.Deserialize<List<List<OpenSkyApiModelData2>>>(stream.ToArray());
+                // string llat = openskylist[0][0].Lat.ToString();
+                // openskyData = openskylist;
+
+               
             }
-
-            
+        }catch(Exception ex)
+        {
+            System.Diagnostics.Debug.Print("deserialize: " + ex.Message.ToString());
         }
+
+
     }
 }
