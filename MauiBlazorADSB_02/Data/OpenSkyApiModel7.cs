@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace MauiBlazorADSB_02.Data
 {
-    [DataContract]
-    internal class OpenSkyApiModel3
+    internal class OpenSkyApiModel7
     {
-        [DataMember]
         public int time { get; set; }
-        [DataMember] 
-        public List<List<OpenSkyApiModelData3>> states { get; set; }
+        public OpenSkyApiModelData7[] states { get; set; }
     }
 
-    [DataContract]
-    internal class OpenSkyApiModelData3
+    internal class OpenSkyApiModelData7
+    {
+
+        public OpenSkyApiModelList7[] list { get; set; }
+
+    }
+
+    internal class OpenSkyApiModelList7
     {
         /*
            * {
@@ -71,4 +73,5 @@ namespace MauiBlazorADSB_02.Data
         //[DataMember]
         //public int Category { get; set; }
     }
+
 }
