@@ -91,61 +91,42 @@ else
         OpenSkyApiService openskyService = new OpenSkyApiService();
         OpenSkyApiModel4 openskyDataResponse = new OpenSkyApiModel4();
 
-        // try
-        // {
-        var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
-        if (data != null)
+        try
         {
-            OpenSkyApiModel5 fopensky = new OpenSkyApiModel5();
-            //ValueKind
-            JsonDocument jsonDoc = JsonDocument.Parse(data.ToString());
-            JsonNode jsonNode = JsonNode.Parse(data.ToString());
-            JsonNode jroot = jsonNode.Root;
-            fopensky.Time = (int)jroot["time"];
-            fopensky.States = new List<OpenSkyApiModelData5>();
-            JsonArray statesarray = jroot["states"]!.AsArray();
-            OpenSkyApiModelData5 list = null;
-            foreach(JsonNode state in statesarray)
+            var data = await openskyService.GetOpenSkyInformationAsync(minlat, minlng, maxlat, maxlng);
+            if (data != null)
             {
-                if (state is JsonArray)
+                OpenSkyApiModel5 fopensky = new OpenSkyApiModel5();
+                //ValueKind
+                JsonDocument jsonDoc = JsonDocument.Parse(data.ToString());
+                JsonNode jsonNode = JsonNode.Parse(data.ToString());
+                JsonNode jroot = jsonNode.Root;
+                fopensky.Time = (int)jroot["time"];
+                fopensky.States = new List<OpenSkyApiModelData5>();
+                JsonArray statesarray = jroot["states"]!.AsArray();
+                OpenSkyApiModelData5 list = null;
+                foreach(JsonNode state in statesarray)
                 {
-                    if(state != null)
+                    if (state is JsonArray)
                     {
-                        list = new OpenSkyApiModelData5();
-                        list = ReturnOpenSkyApi(state.AsArray());
-                        if(list != null)
+                        if(state != null)
                         {
-                            fopensky.States.Add(list);
-                        }
-                    }    
+                            list = new OpenSkyApiModelData5();
+                            list = ReturnOpenSkyApi(state.AsArray());
+                            if(list != null)
+                            {
+                                fopensky.States.Add(list);
+                            }
+                        }    
+                    }
                 }
+
+                openskyData = fopensky.States;
             }
-
-
-            // OpenSkyApiModel5 fopensky = new OpenSkyApiModel5();
-            // openskyDataResponse = JsonSerializer.Deserialize<OpenSkyApiModel4>(data.ToString());
-            // fopensky.Time = openskyDataResponse.Time;
-
-            // for (int i = 0; i < openskyDataResponse.States.ToList().Count; i++)
-            // {
-            //     IList<object> objlist = openskyDataResponse.States[i];
-            //     //var result = System.Text.Json.JsonSerializer.Deserialize<OpenSkyApiModel6>(data.ToString());
-            //     // OpenSkyApiModelData5 dlist = ReturnOpenSkyApi(objlist);
-            //     // if(dlist != null)
-            //     // {
-            //     //     List<OpenSkyApiModelData5> alist = new List<OpenSkyApiModelData5>();
-            //     //     JsonNode jsnode = JsonNode.Parse(alist.ToString());
-            //     //     alist.Add(dlist);
-            //     //     fopensky.States.Add(alist);
-            //     // }
-            // }
-
-            openskyData = fopensky.States;
+        }catch(Exception ex)
+        {
+            System.Diagnostics.Debug.Print("deserialize: " + ex.Message.ToString());
         }
-        // }catch(Exception ex)
-        // {
-        //     System.Diagnostics.Debug.Print("deserialize: " + ex.Message.ToString());
-        // }
     }
 
     //OpenSkyApiModelData4
@@ -186,16 +167,18 @@ else
                 rlist.Utc_timelastcontact = (int)list[UTC_timelastcontact];
                 rlist.Lng = Convert.ToDouble(list[lng].ToString());
                 rlist.Lat = Convert.ToDouble(list[lat].ToString());
-                rlist.Baro_alt = Convert.ToDouble(list[baro_alt].ToString()); //7
+
+                rlist.Baro_alt = CheckJsonArrayDouble(list[baro_alt]); //7
                 rlist.On_grd = (string)list[on_grd].ToString();
-                rlist.Velocity = Convert.ToDouble(list[velocity].ToString());
-                rlist.True_trk = Convert.ToDouble(list[true_trk].ToString());
-                rlist.Vert_rate = Convert.ToDouble(list[vert_rate].ToString()); //vert_rate
+                rlist.Velocity = CheckJsonArrayDouble(list[velocity]);
+                rlist.True_trk = CheckJsonArrayDouble(list[true_trk]);
+                rlist.Vert_rate = CheckJsonArrayDouble(list[vert_rate]); //vert_rate
                 rlist.Sensors = Convert.ToString(list[sensors]);
-                rlist.Geo_alt = Convert.ToDouble(list[geo_alt].ToString()); //13
+                rlist.Geo_alt = CheckJsonArrayDouble(list[geo_alt]); //13
                 rlist.Squawk = Convert.ToString(list[squawk]);
                 rlist.Spi = Convert.ToString(list[spi]);
                 rlist.Position_src = Convert.ToString(list[position_src]);
+
             }catch(NullReferenceException nex)
             {
                 System.Diagnostics.Debug.Print("NEX: " + nex.Message.ToString());
@@ -203,6 +186,20 @@ else
             }
         }
         return rlist;
+    }
+
+    private double CheckJsonArrayDouble(JsonNode jitem)
+    {
+        double jreturn = 0;
+        if(jitem != null)
+        {
+            jreturn = Convert.ToDouble(jitem.ToString());
+        }
+        else
+        {
+            jreturn = 0;
+        }
+        return jreturn;
     }
 
     private string CheckJsonNodeType(JsonNode state)
