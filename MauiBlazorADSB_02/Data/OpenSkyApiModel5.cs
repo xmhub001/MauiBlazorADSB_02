@@ -67,7 +67,8 @@ namespace MauiBlazorADSB_02.Data
         public string Position_src { get; set; }
         //[JsonPropertyName("category")]
         //public int Category { get; set; }
-
+        [JsonPropertyName("trutrakrotate")]
+        public string Trutrakrotate {  get; set; }
 
     }
 

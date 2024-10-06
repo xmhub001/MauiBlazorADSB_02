@@ -1,0 +1,33 @@
+﻿@page "/aviation"
+
+<h1>Aviation Image</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Tru Trak</th>
+            <th>Aviation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@aviationheading</td>
+            <td><img src="imgs/av_jet.jpg" alt="airplane" style="@avhdg" height="30" width="30" /></td>
+        </tr>
+    </tbody>
+</table>
+
+@code {
+    string aviationheading = "";
+    string avhdg = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        double dbHeading = 0; // 270.00;
+        var rnd = new Random();
+        dbHeading = rnd.NextDouble() * 360;
+        aviationheading = $"{(int)dbHeading}";
+        avhdg = $"transform:rotate({aviationheading}deg);";
+        await Task.Delay(100);
+    }
+}

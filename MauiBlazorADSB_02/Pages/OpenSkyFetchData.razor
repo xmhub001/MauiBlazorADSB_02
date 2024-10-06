@@ -21,6 +21,19 @@ else
   <table class="table">
     <thead>
       <tr>
+        <th>TIME:</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>@openskyTime</td>
+        </tr>
+    </tbody>
+  </table>
+
+  <table class="table">
+    <thead>
+      <tr>
         <th>Icao24</th>
         <th>CallSign</th>
         <th>Origin Country</th>
@@ -32,7 +45,7 @@ else
         <th>On_Grd</th>
         <th>Velocity</th>
         @* <th>Heading</th> *@
-        <th>True_Trak</th>
+        <th>Tru Trak</th>
         <th>Vert_Rate</th>
         <th>Sensors</th>
         <th>Geo_alt</th>
@@ -40,10 +53,10 @@ else
         <th>SPI</th>
         <th>Position_Src</th>
         <th>category</th>
+        <th>Compass</th>
       </tr>
     </thead>
     <tbody>
-      
       @foreach (var osky in openskyData)
       {
         <tr>
@@ -66,10 +79,25 @@ else
           <td>@osky.Spi.ToString()</td>
           <td>@osky.Position_src.ToString()</td>
           @* <td>@osky.Category.ToString()</td> *@
+          <td><img src="imgs/av_jet.jpg" alt="airplane" style=@osky.Trutrakrotate height="30" width="30" /></td>
+
         </tr>
       }
     </tbody>
   </table>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>ERROR:</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>@openskyError.ToString()</td>
+            </tr>
+        </tbody>
+    </table>
 
 }
 
@@ -78,11 +106,14 @@ else
     //  array list = [icao24, callsign, origin_country, utc_timeposition, utc_timelastcontact, lng, lat, baro_alt,
     // on_grd, velocity, true_trk, vert_rate, sensors, geo_alt, squawk, spi, position_src, category];
     private List<OpenSkyApiModelData5> openskyData;
+    private string openskyTime;
+    private string openskyError;
 
     //https_//opensky-network.org/api/states/all?lamin=37.020&lomin=-109.080&lamax=40.980&lomax=-102.080
 
     protected override async Task OnInitializedAsync()
     {
+        openskyError = "";
         string minlat = "37.020"; //37.020
         string minlng = "-109.080"; //-109.080
         string maxlat = "40.980"; //40.980
@@ -103,10 +134,18 @@ else
                 JsonNode jroot = jsonNode.Root;
                 fopensky.Time = (int)jroot["time"];
                 fopensky.States = new List<OpenSkyApiModelData5>();
-                JsonArray statesarray = jroot["states"]!.AsArray();
-                OpenSkyApiModelData5 list = null;
-                foreach(JsonNode state in statesarray)
+                JsonArray statesarray = null;
+                if (jroot["states"] != null)
                 {
+                    statesarray = jroot["states"]!.AsArray();
+                }
+                OpenSkyApiModelData5 list = null;
+                for(int i = 0; i < statesarray.Count; i++)
+                {
+                    JsonNode state = statesarray[i];
+                // }
+                // foreach(JsonNode state in statesarray)
+                // {
                     if (state is JsonArray)
                     {
                         if(state != null)
@@ -120,12 +159,22 @@ else
                         }    
                     }
                 }
-
+                openskyTime = fopensky.Time.ToString();
                 openskyData = fopensky.States;
             }
         }catch(Exception ex)
         {
-            System.Diagnostics.Debug.Print("deserialize: " + ex.Message.ToString());
+            string deserializeErr = "deserialize: " + ex.Message.ToString();
+            System.Diagnostics.Debug.Print(deserializeErr);
+            openskyError = openskyError + " " + deserializeErr;
+        }
+        finally
+        {
+            if (openskyError.Length > 0 && openskyData.Count == 0)
+            {
+                openskyData.Add(new OpenSkyApiModelData5());
+                openskyData[0].Icao24 = openskyError.ToString();
+            }
         }
     }
 
@@ -178,10 +227,13 @@ else
                 rlist.Squawk = Convert.ToString(list[squawk]);
                 rlist.Spi = Convert.ToString(list[spi]);
                 rlist.Position_src = Convert.ToString(list[position_src]);
+                rlist.Trutrakrotate = $"transform:rotate({rlist.True_trk.ToString()}deg);";
 
             }catch(NullReferenceException nex)
             {
-                System.Diagnostics.Debug.Print("NEX: " + nex.Message.ToString());
+                string returnOpenSkyApiErr = "NEX: " + nex.Message.ToString();
+                System.Diagnostics.Debug.Print(returnOpenSkyApiErr);
+                openskyError = openskyError + " " + returnOpenSkyApiErr;
                 rlist = null;
             }
         }
