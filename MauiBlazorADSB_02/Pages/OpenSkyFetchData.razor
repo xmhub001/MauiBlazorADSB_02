@@ -20,13 +20,13 @@ else
 {
   <table class="table">
     <thead>
-      <tr>
-        <th>TIME:</th>
+      <tr class="text-start">
+          <th colspan="11">TIME AND COUNT</th>
       </tr>
     </thead>
     <tbody>
-        <tr>
-            <td>@openskyTime</td>
+        <tr class="text-start">
+          <td colspan="11" >TIME: @openskyTime AND COUNT: @openskyCount</td>
         </tr>
     </tbody>
   </table>
@@ -107,6 +107,7 @@ else
     // on_grd, velocity, true_trk, vert_rate, sensors, geo_alt, squawk, spi, position_src, category];
     private List<OpenSkyApiModelData5> openskyData;
     private string openskyTime;
+    private string openskyCount;
     private string openskyError;
 
     //https_//opensky-network.org/api/states/all?lamin=37.020&lomin=-109.080&lamax=40.980&lomax=-102.080
@@ -120,7 +121,7 @@ else
         string maxlng = "-102.080"; //-102.080
 
         OpenSkyApiService openskyService = new OpenSkyApiService();
-        OpenSkyApiModel4 openskyDataResponse = new OpenSkyApiModel4();
+        //OpenSkyApiModel4 openskyDataResponse = new OpenSkyApiModel4();
 
         try
         {
@@ -138,8 +139,14 @@ else
                 if (jroot["states"] != null)
                 {
                     statesarray = jroot["states"]!.AsArray();
+                    openskyCount = statesarray.Count.ToString();
                 }
                 OpenSkyApiModelData5 list = null;
+                if (statesarray == null)
+                {
+                    openskyData = null;
+                }
+
                 for(int i = 0; i < statesarray.Count; i++)
                 {
                     JsonNode state = statesarray[i];

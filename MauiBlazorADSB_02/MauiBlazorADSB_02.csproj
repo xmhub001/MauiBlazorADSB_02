@@ -1,7 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
     <PropertyGroup>
-        <TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
+      <SelfContained>true</SelfContained>
+        <!--;net7.0-maccatalyst-->
+        <TargetFrameworks>net7.0-android;net7.0-ios</TargetFrameworks>
         <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
         <!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
         <!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
@@ -24,7 +26,7 @@
         <ApplicationVersion>1</ApplicationVersion>
 
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.2</SupportedOSPlatformVersion>
-        <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>
+        <!--<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'maccatalyst'">14.0</SupportedOSPlatformVersion>-->
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">24.0</SupportedOSPlatformVersion>
         <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
         <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
@@ -47,6 +49,28 @@
 
         <!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
         <MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <AndroidResource Remove="Platforms\MacCatalyst\**" />
+      <Compile Remove="Platforms\MacCatalyst\**" />
+      <Content Remove="Platforms\MacCatalyst\**" />
+      <EmbeddedResource Remove="Platforms\MacCatalyst\**" />
+      <MauiXaml Remove="Platforms\MacCatalyst\**" />
+      <None Remove="Platforms\MacCatalyst\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Data\OpenSkyApiModel.cs" />
+      <Compile Remove="Data\OpenSkyApiModel2.cs" />
+      <Compile Remove="Data\OpenSkyApiModel3.cs" />
+      <Compile Remove="Data\OpenSkyApiModel4.cs" />
+      <Compile Remove="Data\OpenSkyApiModel6.cs" />
+      <Compile Remove="Data\OpenSkyApiModel7.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Pages\OpenSkyFetchMap.razor" />
     </ItemGroup>
 
     <ItemGroup>
